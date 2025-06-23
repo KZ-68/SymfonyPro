@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+
+<div id="home-wrapper">
+    <div id="home-banner-wrapper">
+        <img class="home-banner-img" src="{{asset('images/White-Interior-Design-scaled.jpg')}}" alt="Image Background Home Design">
+        <div id="home-banner-background">
+            <p>"Lorem ipsum..."</p>
+        </div>
+    </div>
+    <section id="home">
+        <h2>Home</h2>
+        <nav id="home-navigation">
+                <li><a href="{{path('app_register')}}">Register</a></li>
+                <li><a href="{{path('app_login')}}">Login</a></li>
+            </ul>
+        </nav>
+    </section>
+</div>
+{% endblock %}
