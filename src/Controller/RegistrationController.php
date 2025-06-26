@@ -90,4 +90,10 @@ class RegistrationController extends AbstractController
 
         return $this->redirectToRoute('app_register');
     }
+
+    #[Route('/inscription/success', name: 'registration_success')]
+    public function oauthRegistrationSuccess(): Response
+    {
+        return $this->render('registration/registration_success.html.twig');
+    }
 }
