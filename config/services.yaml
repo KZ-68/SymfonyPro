@@ -18,4 +18,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Security\OAuthConnector: ~
+    App\Security\OAuthUserProvider : ~
+    App\Security\OAuthConnector:
+        arguments:
+            $properties:
+                'google': 'googleId'
+    App\EventListener\OAuthRegistrationRedirectListener:
+        tags:
+            - { name: 'kernel.event_subscriber' }
