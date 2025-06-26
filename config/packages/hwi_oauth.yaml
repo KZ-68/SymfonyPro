@@ -11,3 +11,7 @@ hwi_oauth:
                 refresh_on_expire: true
                 access_type:     offline
                 approval_prompt: force
+    connect:
+        account_connector: App\Security\OAuthConnector
+        registration_form: App\Form\OAuthRegistrationFormType
+        registration_form_handler: App\Security\OAuthFormHandler
