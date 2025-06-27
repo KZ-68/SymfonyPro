@@ -13,6 +13,9 @@ services:
       MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
       MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-https://${SERVER_NAME:-localhost}/.well-known/mercure}
       MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN_DOCKER}
+      MAILER_DSN: ${MAILER_DSN_DOCKER}
+      MAIL_ENCRYPTION: tls
     volumes:
       - caddy_data:/data
       - caddy_config:/config
@@ -47,6 +50,11 @@ services:
     volumes:
      - ./docker/db/data:/var/lib/mysql:rw
   ###< doctrine/doctrine-bundle ###
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
 
 volumes:
   caddy_data:

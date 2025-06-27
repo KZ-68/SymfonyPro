@@ -23,6 +23,7 @@ RUN set -eux; \
 		intl \
 		opcache \
 		zip \
+		amqp \
 	;
 
 RUN docker-php-ext-install pdo_mysql
@@ -86,3 +87,7 @@ RUN set -eux; \
 	composer dump-env prod; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync;
+
+# Install amqp extension for Symfony
+RUN set -eux; \
+	composer require symfony/amqp-messenger
