@@ -38,7 +38,8 @@ class RegistrationController extends AbstractController
                 if($agreeTerms === true) {
                     // encode the plain password
                     $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
-
+                    $user->setAgreedTerms(true);
+                    
                     $entityManager->persist($user);
                     $entityManager->flush();
 
