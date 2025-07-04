@@ -14,10 +14,11 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
-class RegistrationForm extends AbstractType
+class RegistrationForm extends HoneyPotType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        parent::buildForm($builder, $options);
         $builder
             ->add('email', EmailType::class)
             ->add('agreeTerms', CheckboxType::class, [
