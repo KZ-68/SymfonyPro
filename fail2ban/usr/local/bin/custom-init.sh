@@ -1,4 +1,5 @@
 #!/bin/sh
+
 set -e
 
 echo "🔧 Génération dynamique du filtre Fail2ban 'frankenphp'..."
