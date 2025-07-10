@@ -2,16 +2,12 @@
 
 namespace App\Form;
 
-use App\Entity\User;
-use HoneyPotSubscriber;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
+use App\EventSubscriber\HoneyPotSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class HoneyPotType extends AbstractType
 {

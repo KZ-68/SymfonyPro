@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Service;
+
 use App\Entity\User;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;

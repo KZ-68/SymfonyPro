@@ -1,5 +1,7 @@
 <?php
 
+namespace App\EventSubscriber;
+
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
