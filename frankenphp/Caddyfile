@@ -10,6 +10,8 @@
 
 {$SERVER_NAME:localhost} {
 	log {
+		output file /var/log/frankenphp/access.log
+        format console
 		{$CADDY_SERVER_LOG_OPTIONS}
 		# Redact the authorization query parameter that can be set by Mercure
 		format filter {
