@@ -23,3 +23,7 @@
 .env.test
 /docker
 /logs
+
+###> fail2ban ###
+/fail2ban/data/db
+###< fail2ban ###
