@@ -5,5 +5,7 @@ logpath   = /var/log/frankenphp/access.log
 port      = http,https
 findtime = 10m
 bantime   = 60000000
-banaction = iptables-multiport
+protocol = tcp
+chain = DOCKER-USER
 maxretry  = 3
+action = docker-user-ban[name=frankenphp]
