@@ -10,15 +10,13 @@
 
 {$SERVER_NAME:localhost} {
 	log {
-		output file /var/log/frankenphp/access.log
-        format console
-		{$CADDY_SERVER_LOG_OPTIONS}
-		# Redact the authorization query parameter that can be set by Mercure
-		format filter {
-			request>uri query {
-				replace authorization REDACTED
-			}
+		output file /var/log/frankenphp/access.log {
+			roll_size 12mb
+			roll_keep 10
+			roll_keep_for 2160h
 		}
+
+		format transform `{request>headers>X-Forwarded-For>[0]:request>remote_ip} "{resp_headers>X-Debug-Exception>[0]}" - {request>method} {request>uri} {status}`
 	}
 
 	root /app/public
