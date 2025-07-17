@@ -16,7 +16,7 @@
 			roll_keep_for 2160h
 		}
 
-		format transform `{request>headers>X-Forwarded-For>[0]:request>remote_ip} "{resp_headers>X-Debug-Exception>[0]}" - {request>method} {request>uri} {status}`
+		format transform `{request>headers>X-Forwarded-For>[0]:request>remote_ip} - {resp_headers>Date} - "{resp_headers>X-Debug-Exception>[0]}" - {request>method} {request>uri} {status}`
 	}
 
 	root /app/public
