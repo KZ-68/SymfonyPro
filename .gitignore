@@ -26,4 +26,6 @@
 
 ###> fail2ban ###
 /fail2ban/data/db
+/fail2ban/etc/caddy/banned-ips
+/etc/caddy/banned-ips
 ###< fail2ban ###
