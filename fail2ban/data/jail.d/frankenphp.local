@@ -1,4 +1,5 @@
 [frankenphp]
+ignoreself = false
 enabled   = true
 filter    = frankenphp
 logpath   = /var/log/frankenphp/access.log
@@ -8,4 +9,4 @@ bantime   = 60000000
 protocol = tcp
 chain = DOCKER-USER
 maxretry  = 3
-action = docker-user-ban[name=frankenphp]
+action = docker-user-ban[banfile_path="/etc/caddy/banned-ips"]
