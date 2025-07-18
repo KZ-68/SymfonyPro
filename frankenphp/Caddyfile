@@ -9,6 +9,11 @@
 {$CADDY_EXTRA_CONFIG}
 
 {$SERVER_NAME:localhost} {
+	header {
+		X-Real-IP {remote_host}
+		X-Forwarded-For {remote_host}
+	}
+
 	log {
 		output file /var/log/frankenphp/access.log {
 			roll_size 12mb
@@ -16,7 +21,16 @@
 			roll_keep_for 2160h
 		}
 
-		format transform `{request>headers>X-Forwarded-For>[0]:request>remote_ip} - {resp_headers>Date} - "{resp_headers>X-Debug-Exception>[0]}" - {request>method} {request>uri} {status}`
+		format transform `{request>client_ip} - {resp_headers>Date} - "{resp_headers>X-Debug-Exception>[0]}" - {request>method} {request>uri} {status}`
+	}
+
+	@banned {
+		fail2ban /etc/caddy/banned-ips
+		method GET
+	}
+
+	handle @banned {
+		abort
 	}
 
 	root /app/public
