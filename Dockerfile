@@ -16,7 +16,8 @@ RUN CGO_ENABLED=1 \
         # Mercure and Vulcain are included in the official build, but feel free to remove them
         --with github.com/dunglas/mercure/caddy \
         --with github.com/dunglas/vulcain/caddy \
-		--with github.com/caddyserver/transform-encoder
+		--with github.com/caddyserver/transform-encoder \
+		--with github.com/Javex/caddy-fail2ban@main
         # Add extra Caddy modules here
 
 FROM dunglas/frankenphp:1-php8.3 AS frankenphp_upstream
@@ -114,7 +115,3 @@ RUN set -eux; \
 # Install amqp extension for Symfony
 RUN set -eux; \
 	composer require symfony/amqp-messenger
-
-COPY --link --chmod=755 frankenphp/convert-logs.sh /usr/local/bin/convert-logs
-
-CMD [ "frankenphp", "run", "/usr/local/bin/convert-logs", "--watch" ]
