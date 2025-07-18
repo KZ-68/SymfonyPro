@@ -9,6 +9,10 @@ services:
       - ./frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
       - ./logs:/var/log/frankenphp:rw
+      - ./frankenphp/hosts:/etc/caddy/hosts
+    ports:
+      - 80:80
+      - 443:443
     environment:
       MERCURE_EXTRA_DIRECTIVES: demo
       XDEBUG_MODE: "${XDEBUG_MODE:-off}"
@@ -29,6 +33,7 @@ services:
       volumes:
         - ./logs:/var/log/frankenphp:rw
         - ./fail2ban/data:/data
+        - ./etc/caddy/banned-ips:/etc/caddy:rw
       restart: unless-stopped
 ###< fail2ban ###
 
