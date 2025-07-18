@@ -7,8 +7,9 @@ echo "🔧 Génération dynamique du filtre Fail2ban 'frankenphp'..."
 if [ ! -f /data/filter.d/frankenphp.conf ]; then
 cat <<EOF > /data/filter.d/frankenphp.conf
 [Definition]
-failregex = ^<HOST> - Go away to my form, bot !$
+failregex = ^<HOST> - \[".*?"\] - "Go%%20away%%20to%%20my%%20form%%2C%%20bot%%20%%21"
 ignoreregex =
+datepattern = %%a, %%d %%b %%Y %%H:%%M:%%S %%Z
 EOF
 else
 echo "Le filtre 'frankenphp.conf' est déjà présent."
@@ -26,7 +27,7 @@ bantime   = 60000000
 protocol = tcp
 chain = DOCKER-USER
 maxretry  = 3
-action = docker-user-ban[name=frankenphp]
+action = docker-user-ban[banfile_path="/etc/caddy/banned-ips"]
 EOF
 else
 echo "Jail 'frankenphp.local' est déjà présent."
@@ -34,15 +35,45 @@ fi
 
 if [ ! -f /data/action.d/docker-user-ban.conf ]; then
 cat <<EOF > /data/action.d/docker-user-ban.conf
+# Fail2Ban configuration file for caddy banning
+#
+# Author: Florian Ruechel
+#
+# To use 'caddy-banfile' action you need to use the caddy-fail2ban extension.
+# It can be found at https://github.com/Javex/caddy-fail2ban
+# Install and configure it like this:
+# @banned {
+#   fail2ban ./banfile
+# }
+# handle @banned {
+#   abort
+# }
+#
+# Follow the README in the repo for more information.
+
 [Definition]
-actionstart =
-actionstop =
-actioncheck =
-actionban = iptables-legacy -A FORWARD -s <ip> -j DROP
-actionunban = iptables-legacy -A FORWARD -s <ip> -j DROP
+
+# Path where to store banned IPs
+banfile_path = /etc/caddy/banned-ips
+
+# Action definition:
+
+actionstart_on_demand = false
+actionstart = touch '%(banfile_path)s'
+
+actionflush = truncate -s 0 '%(banfile_path)s'
+
+actionstop = %(actionflush)s
+
+actioncheck = 
+
+_echo_blck_row = printf '%%s\n' "<fid>"
+
+actionban = %(_echo_blck_row)s >> '%(banfile_path)s'
+
+actionunban = id=$"(%(_echo_blck_row)s | sed -e 's/[]\/$*.^|[]/\\&/g')"; sed -i "/^$id$/d" %(banfile_path)s
 
 [Init]
-iptables = iptables-legacy
 name = docker-user-ban
 EOF
 else
