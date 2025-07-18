@@ -39,7 +39,8 @@ class HoneyPotType extends AbstractType
         return [
             'attr' => [
                 'autocomplete' => 'off',
-                'tabindex' => '-1'
+                'tabindex' => '-1',
+                'hidden' => true
             ],
             'data' => 'fake data',
             'mapped' => false,
