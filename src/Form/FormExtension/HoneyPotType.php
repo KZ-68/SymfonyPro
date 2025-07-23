@@ -42,7 +42,7 @@ class HoneyPotType extends AbstractType
                 'tabindex' => '-1',
                 'hidden' => true
             ],
-            'data' => 'fake data',
+            'data' => '',
             'mapped' => false,
             'required' => false
         ];
