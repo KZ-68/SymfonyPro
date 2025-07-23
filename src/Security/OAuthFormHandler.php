@@ -3,7 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
-use UserRegistrationService;
+use App\Service\UserRegistrationService;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
