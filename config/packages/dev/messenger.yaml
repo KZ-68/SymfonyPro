@@ -1,0 +1,29 @@
+framework:
+    messenger:
+        failure_transport: failed_default
+
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+
+            async_priority_low:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 3
+                    multiplier: 2
+
+            failed_default: 'doctrine://default?queue_name=failed_default'
+
+        default_bus: messenger.bus.default
+
+        buses:
+            messenger.bus.default: []
+
+        routing:
+            Symfony\Component\Mailer\Messenger\SendEmailMessage: async_priority_low
+            Symfony\Component\Notifier\Message\ChatMessage: async_priority_low
+            Symfony\Component\Notifier\Message\SmsMessage: async_priority_low
+            App\Message\SampleMessage: async_priority_low
+            App\Security\EmailVerifier: async_priority_low
+
+            # Route your messages to the transports
+            # 'App\Message\YourMessage': async

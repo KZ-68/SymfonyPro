@@ -26,7 +26,7 @@ framework:
                         name: registration_email_failed
                     queues:
                         registration_email_failed: ~
-            # sync: 'sync://'
+            sync: 'sync://'
 
         default_bus: messenger.bus.default
 
