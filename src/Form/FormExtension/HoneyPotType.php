@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\FormExtension;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
