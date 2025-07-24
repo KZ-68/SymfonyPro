@@ -11,8 +11,11 @@
         {% if app.user.password is not null %}
         <li><a href="{{path('edit_password')}}">Edit Password</a></li>
         {% endif %}
-        <li><a>Remove Profile</a></li>
+        <li><button id="btn-popup">Delete Account</button></li>
         <li><a></a></li>
     </ul>
+    <div id="popup-wrapper">
+        <div class="popup-body"></div>
+    </div>
 </section>
 {% endblock %}
