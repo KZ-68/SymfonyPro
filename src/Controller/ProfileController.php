@@ -3,9 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use DateTimeImmutable;
 use App\Form\UserPasswordFormType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -111,7 +112,7 @@ class ProfileController extends AbstractController
         methods:['POST']
     )]
     #[IsGranted('ROLE_USER')]
-    public function deleteAccount(Request $request, EntityManagerInterface $entityManager, Session $session, TokenStorageInterface $tokenStorage): Response {
+    public function deleteAccount(Request $request, UserRepository $userRepository, Session $session, TokenStorageInterface $tokenStorage): Response {
 
         $user = $this->getUser();
 
@@ -120,17 +121,13 @@ class ProfileController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $user->setUsername('Anon User #'.uniqid('', true));
-            $user->setEmail(null);
-            $user->setFirstName(null);
-            $user->setLastName(null);
-            $user->setGoogleId(null);
-            $entityManager->flush();
+            $userId = $user->getId();
+            $userRepository->anonymizeUser($userId);
             $tokenStorage->setToken(null);
             $session->invalidate();
-            return $this->redirectToRoute('home_index');
+            return $this->redirectToRoute('app_home');
         } else {
-            return $this->redirectToRoute('home_index');
+            return $this->redirectToRoute('app_home');
         }
     }
 }
