@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                     document.body.style.overflowY = 'hidden';
                                     popupWrapper.style.overflowY = 'auto';
+
+                                    let deleteBtn = document.getElementById('confirm-btn');
+                                    if (deleteBtn) {
+                                        deleteProfile(deleteBtn);
+                                    }
                                 }
                             });
                         }
@@ -49,19 +54,16 @@ document.addEventListener('DOMContentLoaded', function () {
     xhr.send();
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    let deleteBtn = document.getElementById('confirm-btn');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            let xhr = new XMLHttpRequest();
-            xhr.open('POST', path('AppBundle\\Controller\\UserController::deleteAccount'), true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.send();
-        });
-    }
-});
+function deleteProfile(deleteBtn) {
+    deleteBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/profile/settings/popup/delete', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send();
+    });
+}
 
 function closeDialog(wrapper) {
     let fadeOut = setInterval(function () {
