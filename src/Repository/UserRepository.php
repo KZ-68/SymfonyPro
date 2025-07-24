@@ -33,6 +33,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    public function anonymizeUser($id) {
+        return $this->createQueryBuilder('u')
+            ->update()
+            ->set('u.username', ':username')
+            ->set('u.email', 'NULL')
+            ->set('u.firstName', 'NULL')
+            ->set('u.lastName', 'NULL')
+            ->set('u.googleId', 'NULL')
+            ->set('u.updatedAt', ':updatedAt')
+            ->andWhere('u.id = :userId')
+            ->setParameter('username', 'Anon User #' . uniqid('', true))
+            ->setParameter('updatedAt', new \DateTimeImmutable('now'))
+            ->setParameter('userId', $id)
+            ->getQuery()
+            ->execute();
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */
