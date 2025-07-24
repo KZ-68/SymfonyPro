@@ -256,3 +256,15 @@ section.section-wrapper {
     align-items: start;
     margin: 1rem 1.25rem;
 }
+
+#btn-popup {
+    padding: 5px;
+    border-radius: 0.5rem;
+    border: none;
+    background-color:darkred;
+    color: white;
+}
+
+#popup-wrapper {
+    display: none;
+}
