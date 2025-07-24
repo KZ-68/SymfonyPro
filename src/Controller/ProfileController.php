@@ -5,12 +5,15 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserPasswordFormType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ProfileController extends AbstractController
 {
@@ -85,5 +88,49 @@ class ProfileController extends AbstractController
         return $this->render('profile/edit-password.html.twig', [
             'form' => $form,
         ]);
+    }
+
+    #[Route(
+        '/profile/settings/popup', 
+        name: 'settings_delete_popup',
+        methods:['GET', 'POST']
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function popupDeleteAccount(Request $request): Response {
+
+        if(!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('profile/_partials/anonymize-profile-modal.html.twig');
+    }
+
+    #[Route(
+        '/profile/settings/popup/delete', 
+        name: 'settings_delete_profile', 
+        methods:['POST']
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function deleteAccount(Request $request, EntityManagerInterface $entityManager, Session $session, TokenStorageInterface $tokenStorage): Response {
+
+        $user = $this->getUser();
+
+        if(!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if ($request->isMethod('POST')) {
+            $user->setUsername('Anon User #'.uniqid('', true));
+            $user->setEmail(null);
+            $user->setFirstName(null);
+            $user->setLastName(null);
+            $user->setGoogleId(null);
+            $entityManager->flush();
+            $tokenStorage->setToken(null);
+            $session->invalidate();
+            return $this->redirectToRoute('home_index');
+        } else {
+            return $this->redirectToRoute('home_index');
+        }
     }
 }
