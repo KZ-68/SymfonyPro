@@ -3,37 +3,34 @@
 namespace App\Service;
 
 use App\Entity\User;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Security\EmailVerifier;
+use Symfony\Component\Mime\Address;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserRegistrationService {
+final class UserRegistrationService
+{
+    public function __construct(
+        private UserPasswordHasherInterface $passwordHasher,
+        private EntityManagerInterface $em,
+        private EmailVerifier $emailVerifier,
+    ) {}
 
-    public function createUserFromForm(
-        FormInterface $form, 
-        User $user, 
-        UserResponseInterface $userInformation,
-        Request $request
-    ): ?bool
-    {
-        $user->setEmail($userInformation->getEmail());
-        $user->setUsername($userInformation->getNickname());
-        $user->setFirstName($userInformation->getFirstName());
-        $user->setLastName($userInformation->getLastName());
+    public function register(User $user, string $plainPassword): void
+    {   
+        $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
+        $user->setAgreedTerms(true);
+        $this->em->persist($user);
+        $this->em->flush();
 
-        $form->setData($user);
-        $form->handleRequest($request);
-
-        $agreeTerms = $form->get('agreeTerms')->getData();
-        if($agreeTerms === true) {
-            $user->setAgreedTerms(true);
-        }
-        if ($form->isSubmitted() && $form->isValid()) {
-            return true;
-        }
-        return false;
+        // generate a signed url and email it to the user
+        $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+            (new TemplatedEmail())
+                ->from(new Address('admin@test.com', 'Admin Mail'))
+                ->to((string) $user->getEmail())
+                ->subject('Please Confirm your Email')
+                ->htmlTemplate('registration/confirmation_email.html.twig')
+        );
     }
 }
