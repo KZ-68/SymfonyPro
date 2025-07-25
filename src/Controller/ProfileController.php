@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Form\UserPasswordFormType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -110,11 +111,9 @@ class ProfileController extends AbstractController
         methods:['POST']
     )]
     #[IsGranted('delete', 'user', 'Access Denied', 403)]
-    public function deleteAccount(Request $request, UserRepository $userRepository, Session $session, TokenStorageInterface $tokenStorage): Response {
+    public function deleteAccount(Request $request, UserRepository $userRepository, Session $session, User $user, TokenStorageInterface $tokenStorage): Response {
 
-        $user = $this->getUser();
-
-        if(!$user) {
+        if($user !== $this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
 
