@@ -15,6 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use App\Service\UserRegistrationService;
 
 class RegistrationController extends AbstractController
 {
@@ -23,7 +24,7 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, UserRegistrationService $userRegistrationService): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationForm::class, $user);
@@ -36,24 +37,7 @@ class RegistrationController extends AbstractController
             if(preg_match($password_regex, $plainPassword)) {
                 $agreeTerms = $form->get('agreeTerms')->getData();
                 if($agreeTerms === true) {
-                    // encode the plain password
-                    $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
-                    $user->setAgreedTerms(true);
-                    
-                    $entityManager->persist($user);
-                    $entityManager->flush();
-
-                    // generate a signed url and email it to the user
-                    $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-                        (new TemplatedEmail())
-                            ->from(new Address('admin@test.com', 'Admin Mail'))
-                            ->to((string) $user->getEmail())
-                            ->subject('Please Confirm your Email')
-                            ->htmlTemplate('registration/confirmation_email.html.twig')
-                    );
-
-                    // do anything else you need here, like send an email
-
+                    $userRegistrationService->register($user, $plainPassword);
                     return $this->redirectToRoute('_profiler_home');
                 } else {
                     $this->addFlash('error', 'We need your consent for the registration');
