@@ -3,7 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
-use App\Service\UserRegistrationService;
+use App\Service\UserOAuthRegistrationService;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +23,7 @@ final class OAuthFormHandler implements RegistrationFormHandlerInterface
     public function process(Request $request, FormInterface $form, UserResponseInterface $userInformation): bool
     {
         $user = new User();
-        $userRegistrationService = new UserRegistrationService;
+        $userRegistrationService = new UserOAuthRegistrationService;
         $userRegistrationService->createUserFromForm($form, $user, $userInformation, $request);
 
         if ($form->isSubmitted() && $form->isValid()) {
