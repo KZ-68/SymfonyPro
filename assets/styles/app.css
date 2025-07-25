@@ -59,6 +59,10 @@ li {
     margin: 1rem 0rem;
 }
 
+hr {
+    width: 30%;
+}
+
 #home {
     margin: 0rem 3rem;
 }
@@ -204,7 +208,11 @@ form[name="registration_form"] button[type="submit"] {
     align-content: center;
 }
 
-#profile-wrapper {
+menu#profile-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: start;
     margin: 3rem 64rem 3rem 6rem;
     padding: 1.50rem 3rem 1.50rem 3rem;
     background-color: #ffffff;
@@ -214,11 +222,6 @@ form[name="registration_form"] button[type="submit"] {
     gap: 20px;
     flex-wrap: wrap;
     align-content: left;
-}
-
-ul#profile-list {
-    margin: 1rem 1rem;
-    padding: 1rem 3rem;
 }
 
 .form-control {
@@ -249,14 +252,6 @@ input[type="submit"] {
     outline: none;
 }
 
-section.section-wrapper {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-items: start;
-    margin: 1rem 1.25rem;
-}
-
 #btn-popup {
     padding: 5px;
     border-radius: 0.5rem;
@@ -267,4 +262,17 @@ section.section-wrapper {
 
 #popup-wrapper {
     display: none;
+}
+
+#anonymize-modal {
+    padding: 10px 15px;
+    width: 500px;
+    position: absolute;
+    top: 40vh;
+    right: 80vh;
+    left: 80vh;
+    background-color: #fcfcfc;
+    border-radius: 10px;
+    z-index: 10;
+    text-align: center;
 }
