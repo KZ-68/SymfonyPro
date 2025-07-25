@@ -4,18 +4,19 @@
 {% block title %}Profile{% endblock %}
 
 {% block body %}
-<section id="profile-wrapper">
+<menu id="profile-wrapper">
     <h1>Profile</h1>
 
-    <ul id="profile-list">
-        {% if app.user.password is not null %}
-        <li><a href="{{path('edit_password')}}">Edit Password</a></li>
-        {% endif %}
-        <li><button id="btn-popup">Delete Account</button></li>
-        <li><a></a></li>
-    </ul>
+    <hr />
+    <h2>Account Administration :</h2>
+    {% if app.user.password is not null %}
+    <li><a href="{{path('edit_password')}}">Edit Password</a></li>
+    {% endif %}
+    <li><button id="btn-popup">Delete Account</button></li>
+    <li><a></a></li>
+
     <div id="popup-wrapper">
         <div class="popup-body"></div>
     </div>
-</section>
+</menu>
 {% endblock %}
