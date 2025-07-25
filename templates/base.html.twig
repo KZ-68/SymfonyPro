@@ -37,7 +37,11 @@
         <footer>
             {% block footer %}
                 <nav>
-                    
+                    <ul>
+                        <li><a href="{{path('privacy_policy')}}">Privacy Policy</a></li>
+                        <li><a href="{{path('terms_of_service')}}">Terms of Service</a></li>
+                        <li><a href="{{ asset('sitemap/sitemap.base.xml') }}">Sitemap</a></li>
+                    </ul>
                 </nav>
             {% endblock footer %}
         </footer>
