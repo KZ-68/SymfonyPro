@@ -38,7 +38,7 @@ class RegistrationController extends AbstractController
                 $agreeTerms = $form->get('agreeTerms')->getData();
                 if($agreeTerms === true) {
                     $userRegistrationService->register($user, $plainPassword);
-                    return $this->redirectToRoute('_profiler_home');
+                    return $this->redirectToRoute('app_profile');
                 } else {
                     $this->addFlash('error', 'We need your consent for the registration');
                     return $this->redirectToRoute('app_register');
