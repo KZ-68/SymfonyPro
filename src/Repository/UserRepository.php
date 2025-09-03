@@ -33,7 +33,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    public function anonymizeUser($id) {
+    public function anonymizeUser($id): mixed {
         return $this->createQueryBuilder('u')
             ->update()
             ->set('u.username', ':username')
@@ -46,6 +46,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setParameter('username', 'Anon User #' . uniqid('', true))
             ->setParameter('updatedAt', new \DateTimeImmutable('now'))
             ->setParameter('userId', $id)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function updateRoleRequest(int $id, array $role): mixed {
+        return $this->createQueryBuilder('u')
+            ->update()
+            ->set('u.role', ':role')
+            ->andWhere('u.id = :userId')
+            ->setParameter('userId', $id)
+            ->setParameter('role', $role)
             ->getQuery()
             ->execute();
     }
