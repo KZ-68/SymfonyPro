@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block body %}
+
+<div id="admin-panel-wrapper">
+    <section id="admin-panel-section-link-list">
+        <hgroup id="admin-panel-header">
+            <h2>Admin Panel</h2>
+        </hgroup>
+        <ul id="admin-panel-section-link-list">
+            <li class="admin-panel-section-link-list_item">
+                <a href="{{path('app_admin_users_list')}}">Users List</a>
+            </li>
+        </ul>
+    </section>
+</div>
+{% endblock %}
