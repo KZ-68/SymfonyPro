@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Users List{% endblock %}
+
+{% block body %}
+
+<div id="users-list-wrapper">
+    <section id="users-list-section">
+        <hgroup id="users-list-header">
+            <h2>Users List</h2>
+        </hgroup>
+        <ul id="users-list-body">
+            {% for user in users %}
+            <li class="users-list_item">
+                {{user.email}}
+                <a role="button" href="">Change Role</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+</div>
+{% endblock %}
