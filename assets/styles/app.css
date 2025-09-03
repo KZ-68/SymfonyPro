@@ -276,3 +276,9 @@ input[type="submit"] {
     z-index: 10;
     text-align: center;
 }
+
+.users-list_item {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
