@@ -1,0 +1,195 @@
+name: Symfony CI/CD Pipeline
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ test ]
+  release:
+    types: [ published ]
+
+env:
+  PHP_VERSION: '8.3'
+  NODE_VERSION: '20'
+
+jobs:
+  # Job de tests
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: symfony_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json, phar, pcre, reflection, spl, tokenizer, zip
+          coverage: xdebug
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install PHP dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Create .env.test
+        run: |
+          cp .env.test .env.test.local
+          echo "DATABASE_URL_TEST=${{secrets.DATABASE_URL_TEST}}" >> .env.test.local
+
+      - name: Create database and run migrations
+        run: |
+          php bin/console doctrine:database:create --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      - name: Load fixtures (if available)
+        run: |
+          if [ -f "src/DataFixtures" ]; then
+            php bin/console doctrine:fixtures:load --no-interaction --env=test
+          fi
+        continue-on-error: true
+
+      - name: Run PHP CS Fixer (dry-run)
+        run: |
+          if [ -f ".php-cs-fixer.php" ]; then
+            vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+          fi
+        continue-on-error: true
+
+      - name: Run PHPStan
+        run: |
+          if [ -f "phpstan.neon" ] || [ -f "phpstan.neon.dist" ]; then
+            vendor/bin/phpstan analyse
+          fi
+        continue-on-error: true
+
+      - name: Run PHPUnit tests
+        run: |
+          vendor/bin/phpunit --coverage-clover coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+
+  # Job de Pull Request - analyse de qualité et commentaires
+  pull_request:
+    name: Pull Request Analysis
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json
+
+      - name: Install PHP dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run security check
+        run: |
+          if command -v symfony &> /dev/null; then
+            symfony check:security
+          else
+            composer audit
+          fi
+
+      - name: Analyze code quality
+        run: |
+          echo "## Analyse de la Pull Request" >> pr_analysis.md
+          echo "" >> pr_analysis.md
+          
+          # Compter les fichiers modifiés
+          FILES_CHANGED=$(git diff --name-only origin/main...HEAD | wc -l)
+          echo "- **Fichiers modifiés:** $FILES_CHANGED" >> pr_analysis.md
+          
+          # Compter les lignes ajoutées/supprimées
+          LINES_STATS=$(git diff --stat origin/main...HEAD | tail -1)
+          echo "- **Statistiques:** $LINES_STATS" >> pr_analysis.md
+          
+          echo "" >> pr_analysis.md
+          echo "### Vérifications effectuées" >> pr_analysis.md
+          echo "- Tests unitaires passés" >> pr_analysis.md
+          echo "- Analyse de sécurité effectuée" >> pr_analysis.md
+          
+          if [ -f ".php-cs-fixer.php" ]; then
+            echo "- Standards de code vérifiés" >> pr_analysis.md
+          fi
+
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs');
+            const analysis = fs.readFileSync('pr_analysis.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: analysis
+            });
+
+  # Notification de fin de pipeline
+  notify:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: [tests, pull_request]
+    if: always()
+
+    steps:
+      - name: Send notification
+        run: |
+          if [ "${{ needs.tests.result }}" == "success" ] && "${{ needs.pull_request.result }}" == "success"; then
+            echo "Pipeline CI/CD terminé avec succès !"
+          else
+            echo "Échec du pipeline CI/CD"
+          fi
