@@ -9,7 +9,7 @@ on:
     types: [ published ]
 
 env:
-  PHP_VERSION: '8.3'
+  PHP_VERSION: '8.4'
   NODE_VERSION: '20'
 
 jobs:
@@ -22,8 +22,8 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: symfony_test
+          MYSQL_PASSWORD: ${{secrets.MYSQL_PASSWORD_TEST}}
+          MYSQL_DATABASE: ${{secrets.MYSQL_DATABASE_TEST}}
         ports:
           - 3306:3306
         options: >-
@@ -110,12 +110,16 @@ jobs:
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
+      
+      - name: create pull request
+        run: gh pr create -B test -H dev --title 'Merge dev into test' --body 'Created by Github action'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Job de Pull Request - analyse de qualité et commentaires
   pull_request:
     name: Pull Request Analysis
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     needs: tests
 
     steps:
