@@ -1,0 +1,14 @@
+<div id="anonymize-modal"  role="alertdialog" aria-modal="true" aria-labelledby="dialog_label" aria-describedby="dialog_desc">
+    <h2 id="role-modal-header">Change Role Confirmation</h2>
+
+    <div class="formulaire-wrapper-role">
+        {{ form_start(editUserForm) }}
+        <div class="formulaire">
+            {{ form_row(editUserForm.roles)}}
+            {{ form_row(editUserForm.save)}}
+        </div>
+        {{ form_end(editUserForm) }}
+    </div>
+
+    <button id="close-btn" type="button">Close</button>
+</div>
