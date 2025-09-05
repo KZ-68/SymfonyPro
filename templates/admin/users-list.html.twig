@@ -13,10 +13,13 @@
             {% for user in users %}
             <li class="users-list_item">
                 {{user.email}}
-                <a role="button" href="">Change Role</a>
+                <button id="admin-btn-popup" data-userId="{{user.id}}">Change Role</button>
             </li>
             {% endfor %}
         </ul>
+        <div id="popup-wrapper">
+            <div class="popup-body"></div>
+        </div>
     </section>
 </div>
 {% endblock %}
