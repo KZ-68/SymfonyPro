@@ -1,58 +1,87 @@
-document.addEventListener('DOMContentLoaded', function () {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', '/profile/settings/popup', true);
+let btnPopup = document.getElementById('btn-popup');
+let adminBtnPopup = document.getElementById('admin-btn-popup');
 
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                let data = xhr.responseText;
-                console.log(data);
-                if (typeof data !== 'undefined') {
-                    let popupBody = document.querySelector('.popup-body');
-                    if (popupBody) {
-                        popupBody.innerHTML = data;
+if (btnPopup) {
+    displayPopup(btnPopup, false, true);
+}
 
-                        let btnPopup = document.getElementById('btn-popup');
-                        if (btnPopup) {
-                            btnPopup.addEventListener('click', function () {
-                                let closePopBtn = document.getElementById('close-btn');
-                                let popupWrapper = document.getElementById('popup-wrapper');
-                                if (popupWrapper) {
-                                    document.getElementById("close-btn").addEventListener("click", () => {
-                                        closeDialog(popupWrapper);
-                                    });
-                                    popupWrapper.style.display = 'block';
-                                    popupWrapper.style.opacity = 0;
+if (adminBtnPopup) {
+    displayPopup(adminBtnPopup, true, false);
+}
 
-                                    let fadeIn = setInterval(function () {
-                                        let currentOpacity = parseFloat(popupWrapper.style.opacity);
-                                        if (currentOpacity < 1) {
-                                            popupWrapper.style.opacity = currentOpacity + 0.1;
-                                        } else {
-                                            clearInterval(fadeIn);
-                                        }
-                                    }, 30);
+function displayPopup(btnPopup, isAdmin, isSettings) {
+    btnPopup.addEventListener('click', function (e) {
+        e.preventDefault();
 
-                                    document.body.style.overflowY = 'hidden';
-                                    popupWrapper.style.overflowY = 'auto';
+        let user = e.target.dataset.userid;
+        console.log(user);
+        var data = new FormData();
 
-                                    let deleteBtn = document.getElementById('confirm-btn');
-                                    if (deleteBtn) {
-                                        deleteProfile(deleteBtn);
+        let xhr = new XMLHttpRequest();
+        
+        if(isSettings === true) {
+            xhr.open('GET', '/profile/settings/popup', true);
+        }
+
+        if(isAdmin === true) {
+            xhr.open('POST', '/admin/users-list/popup-role', true);
+            data.append('user', user);
+        }
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    let data = xhr.responseText;
+                    console.log(data);
+                    if (typeof data !== 'undefined') {
+                        let popupBody = document.querySelector('.popup-body');
+                        if (popupBody) {
+                            popupBody.innerHTML = data;
+
+                            let closePopBtn = document.getElementById('close-btn');
+                            let popupWrapper = document.getElementById('popup-wrapper');
+                            if (popupWrapper) {
+                                document.getElementById("close-btn").addEventListener("click", () => {
+                                    closeDialog(popupWrapper);
+                                });
+                                popupWrapper.style.display = 'block';
+                                popupWrapper.style.opacity = 0;
+
+                                let fadeIn = setInterval(function () {
+                                    let currentOpacity = parseFloat(popupWrapper.style.opacity);
+                                    if (currentOpacity < 1) {
+                                        popupWrapper.style.opacity = currentOpacity + 0.1;
+                                    } else {
+                                        clearInterval(fadeIn);
                                     }
+                                }, 30);
+
+                                document.body.style.overflowY = 'hidden';
+                                popupWrapper.style.overflowY = 'auto';
+
+                                let deleteBtn = document.getElementById('confirm-delete-btn');
+                                if (deleteBtn) {
+                                    deleteProfile(deleteBtn);
                                 }
-                            });
+
+                            }
+                                
                         }
                     }
-                }
-            } else {
-                alert(xhr.statusText);
-            }
-        }
-    };
 
-    xhr.send();
-});
+                } else {
+                    alert(xhr.statusText);
+                }
+            }
+        };
+
+        if(isAdmin === true) {
+            xhr.send(data);
+        } else {
+            xhr.send();
+        }
+    });
+}
 
 function deleteProfile(deleteBtn) {
     deleteBtn.addEventListener('click', function (e) {
