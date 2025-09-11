@@ -9,9 +9,8 @@ class UserLoginTest extends PantherTestCase
 {
     public function test(): void
     {
-        $client = Client::createChromeClient(__DIR__.'/../../drivers/chromedriver',);
+        $client = Client::createChromeClient('D:/laragon/www/kevin_ZITNIK/SymfonyPro/SymfonyPro/drivers/chromedriver.exe', ['--headless', '--disable-gpu', '--no-sandbox', '--remote-allow-origins=*']);
         $client->request('GET', '/home');
-
         $this->assertPageTitleContains('Symfony Professional Panel');
 
         $this->assertSelectorIsEnabled('.login-link');
