@@ -85,6 +85,11 @@ COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 
+RUN set -eux; \
+	composer require symfony/amqp-messenger
+
+RUN apt-get update && apt-get install -y chromium chromium-driver fonts-liberation ca-certificates
+
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod
 
