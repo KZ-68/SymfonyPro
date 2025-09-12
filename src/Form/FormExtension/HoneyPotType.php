@@ -41,11 +41,11 @@ class HoneyPotType extends AbstractType
                 'autocomplete' => 'off',
                 'tabindex' => '-1',
                 'hidden' => true,
-                'label' => false
             ],
             'data' => '',
             'mapped' => false,
-            'required' => false
+            'required' => false,
+            'label' => false
         ];
     }
 }
