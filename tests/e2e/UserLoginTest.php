@@ -30,10 +30,14 @@ class UserLoginTest extends PantherTestCase
         $this->assertSelectorIsEnabled('.login-link');
         $this->assertSelectorIsEnabled('.register-link');
 
-        $client->request('GET', '/login');
+        $crawler = $client->request('GET', '/login');
 
         $this->assertSelectorExists('[type="submit"]');
 
         $client->submitForm('Sign in', ['_username' => 'test@exemple.com', '_password' => '{OO@a2b6}!#_?']);
+
+        $client->waitFor('#profile-wrapper');
+
+        $this->assertPageTitleContains('Profile');
     }
 }

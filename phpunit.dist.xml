@@ -25,7 +25,7 @@
         <env name="PANTHER_EXTERNAL_BASE_URI" value="http://localhost"/>
         <env name="PANTHER_NO_SANDBOX" value="1"/>
         <env name="PANTHER_CHROME_ARGUMENTS" value="--disable-dev-shm-usage --no-sandbox --disable-gpu --window-size=1920,1080 --ignore-certificate-errors --allow-insecure-localhost"/>
-        <env name="PANTHER_ERROR_SCREENSHOT_DIR" value="var/error-screenshots"/>
+        <env name="PANTHER_ERROR_SCREENSHOT_DIR" value="%kernel.project_dir%/var/error-screenshots"/>
     </php>
 
     <testsuites>

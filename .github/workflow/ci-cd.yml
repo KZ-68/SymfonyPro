@@ -11,6 +11,12 @@ on:
 env:
   PHP_VERSION: '8.4'
   NODE_VERSION: '20'
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   # Job de tests
@@ -22,10 +28,9 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_PASSWORD: ${{secrets.MYSQL_PASSWORD_TEST}}
-          MYSQL_DATABASE: ${{secrets.MYSQL_DATABASE_TEST}}
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
         ports:
-          - 3306:3306
+          - 3307:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -69,10 +74,17 @@ jobs:
       - name: Build assets
         run: npm run build
 
+      - name: Install chromium and chromiumdriver
+        run: | 
+          sudo apt-get update 
+          apt-get install -y chromium chromium-driver fonts-liberation ca-certificates
+
       - name: Create .env.test
         run: |
           cp .env.test .env.test.local
-          echo "DATABASE_URL_TEST=${{secrets.DATABASE_URL_TEST}}" >> .env.test.local
+          echo "DATABASE_URL=${{secrets.DATABASE_URL_TEST}} | 
+          PANTHER_APP_ENV=panther | 
+          PANTHER_ERROR_SCREENSHOT_DIR=./var/error-screenshots" >> .env.test.local
 
       - name: Create database and run migrations
         run: |
@@ -102,6 +114,10 @@ jobs:
 
       - name: Run PHPUnit tests
         run: |
+          vendor/bin/phpunit 
+
+      - name: Run PHPUnit coverage test
+        run: |
           vendor/bin/phpunit --coverage-clover coverage.xml
 
       - name: Upload coverage to Codecov
@@ -110,7 +126,7 @@ jobs:
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
-      
+
       - name: create pull request
         run: gh pr create -B test -H dev --title 'Merge dev into test' --body 'Created by Github action'
         env:
