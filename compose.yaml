@@ -58,6 +58,12 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
+  
+  jmeter:
+    image: justb4/jmeter
+    volumes:
+      - ./tests/opt:/tests/opt
+    command: -n -t /tests/opt/test.jmx -l /tests/opt/results.jtl
 
 volumes:
   caddy_data:
