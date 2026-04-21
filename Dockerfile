@@ -1,3 +1,5 @@
+RUN echo "APP_ENV=dev\nAPP_SECRET=$(openssl rand -hex 16)" > .env
+
 FROM dunglas/frankenphp:builder AS builder
 
 COPY --from=caddy:builder /usr/bin/xcaddy /usr/bin/xcaddy
