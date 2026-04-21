@@ -1,5 +1,7 @@
 FROM dunglas/frankenphp:builder AS builder
 
+ARG DATABASE_URL="mysql://user:password@localhost:3306/db?serverVersion=8.0&charset=utf8mb4"
+
 RUN echo "APP_ENV=dev\nAPP_SECRET=$(openssl rand -hex 16)" > .env.dev
 
 COPY --from=caddy:builder /usr/bin/xcaddy /usr/bin/xcaddy
@@ -116,6 +118,7 @@ RUN set -eux; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer dump-env prod; \
+    DATABASE_URL="${DATABASE_URL}" \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync;
 
