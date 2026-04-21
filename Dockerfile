@@ -1,6 +1,6 @@
 FROM dunglas/frankenphp:builder AS builder
 
-RUN echo "APP_ENV=dev\nAPP_SECRET=$(openssl rand -hex 16)" > .env
+RUN echo "APP_ENV=dev\nAPP_SECRET=$(openssl rand -hex 16)" > .env.dev
 
 COPY --from=caddy:builder /usr/bin/xcaddy /usr/bin/xcaddy
 
@@ -92,6 +92,8 @@ RUN apt-get update && apt-get install -y chromium chromium-driver fonts-liberati
 
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod
+
+RUN echo "APP_ENV=prod" > .env && echo "APP_SECRET=$(openssl rand -hex 16)" >> .env
 
 ENV APP_ENV=prod
 ENV FRANKENPHP_CONFIG="import worker.Caddyfile"
