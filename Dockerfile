@@ -1,7 +1,5 @@
 FROM dunglas/frankenphp:builder AS builder
 
-ARG DATABASE_URL="mysql://user:password@localhost:3306/db?serverVersion=8.0&charset=utf8mb4"
-
 RUN echo "APP_ENV=dev\nAPP_SECRET=$(openssl rand -hex 16)" > .env.dev
 
 COPY --from=caddy:builder /usr/bin/xcaddy /usr/bin/xcaddy
@@ -75,6 +73,7 @@ CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile" ]
 FROM frankenphp_base AS frankenphp_dev
 
 ENV APP_ENV=dev XDEBUG_MODE=off
+ENV DATABASE_URL="mysql://user:password@localhost:3306/db?serverVersion=8.0&charset=utf8mb4"
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
@@ -99,6 +98,7 @@ RUN echo "APP_ENV=prod" > .env && echo "APP_SECRET=$(openssl rand -hex 16)" >> .
 
 ENV APP_ENV=prod
 ENV FRANKENPHP_CONFIG="import worker.Caddyfile"
+ENV DATABASE_URL="mysql://user:password@localhost:3306/db?serverVersion=8.0&charset=utf8mb4"
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
